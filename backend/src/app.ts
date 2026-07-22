@@ -21,7 +21,7 @@ const app: Application = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: env.CORS_ORIGIN === '*' ? '*' : env.CORS_ORIGIN.split(','),
+    origin: (_origin, callback) => callback(null, true),
     credentials: true,
   })
 );
