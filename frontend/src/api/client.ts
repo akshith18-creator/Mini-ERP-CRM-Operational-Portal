@@ -1,7 +1,15 @@
 import axios from 'axios';
 
+const getBaseUrl = () => {
+  let url = import.meta.env.VITE_API_URL || '/api/v1';
+  if (!url.endsWith('/')) {
+    url += '/';
+  }
+  return url;
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api/v1',
+  baseURL: getBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
@@ -9,6 +17,10 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
+    // Clean up leading slash from relative URLs to ensure Axios appends to baseURL path properly
+    if (config.url && config.url.startsWith('/') && config.baseURL) {
+      config.url = config.url.substring(1);
+    }
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
